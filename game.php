@@ -21,55 +21,104 @@
 		var ctx = null;
         
         var press = false;
-        var super_x=150, super_y=150;
+        var player1 = null;
+        var player2 = null;
+        var direccion = 'right';
+        var score = 0;
+        var speed = 10;
         
         function run(){
             cv = document.getElementById('mycanvas');
 		    ctx = cv.getContext('2d');
+
+            player1 = new Cuadro(250,250,40,40,"pink");
+            player2 = new Cuadro(getRandomInt(400),getRandomInt(400),40,40,"purple");
             paint();
         }
 
-        function paint(){
+        function paint()
+        {
 
             window.requestAnimationFrame(paint)
 
-			ctx.fillStyle = "white";
+			ctx.fillStyle = "lightblue";
 			ctx.fillRect(0,0,800,800);
-			ctx.fillStyle = getRandomColor();
-			ctx.fillRect(super_x,super_y,55,55);
-			ctx.strokeRect(super_x,super_y,55,55);
-            
-            super_x +=5;
-            if(super_x>800){
-                super_x =0;
-            }
+
+            ctx.fillStyle = "black";
+            ctx.fillText("SCORE: " + score, 10,20);
+
+			player1.pintar(ctx);
+            player2.pintar(ctx);           
+
+            update();
+
 
 		}
 
-  /*      document.addEventListener('keydown',function(e){
-			console.log(e)
-			//arriba
-			if(e.keyCode == 87 || e.keyCode == 38 ){
-				super_y -=10;
+        function update(){
+			if(direccion == "up"){
+				player1.y -=speed;
+                if(player1.y < 0){
+                    player1.y = 800;
+                }
 			}
 
-			//abajo
-			if(e.keyCode == 83 || e.keyCode == 40 ){
-				super_y +=10;
-			}
-			//izquierda
-			if(e.keyCode == 65 || e.keyCode == 37 ){
-				super_x -=10;
+			if(direccion == "down"){
+				player1.y += speed;
+                if(player1.y > 800){
+                    player1.y = 0;
+                }
 			}
 			
-			//derecha
-			if(e.keyCode == 68 || e.keyCode == 39 ){
-				super_x +=10;
+			if(direccion == "left"){
+                player1.x -=speed;
+                if(player1.x < 0){
+                    player1.x = 800;
+                }
+                
 			}
 			
-			paint();
-		})
-*/
+			
+			if(direccion == "right" ){
+                player1.x += speed;
+                if(player1.x > 800){
+                    player1.x = 0;
+                }
+                
+			}
+
+           if(player1.se_tocan(player2)){
+                player2.x = getRandomInt(400);
+                player2.y = getRandomInt(400);
+                score +=10;
+                speed +=5;
+           }
+        }   
+        function Cuadro(x,y,w,h,c){
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+            this.c = c;
+
+            this.se_tocan = function (target) { 
+                if(this.x < target.x + target.w &&
+                    this.x + this.w > target.x && 
+                    this.y < target.y + target.h && 
+                    this.y + this.h > target.y)
+                {
+                    return true;
+                }  
+            };
+
+            this.pintar = function(ctx){
+                ctx.fillStyle = this.c;
+			    ctx.fillRect(this.x,this.y,this.w,this.h);
+			    ctx.strokeRect(this.x,this.y,this.w,this.h);
+            }
+
+        }        
+
         window.requestAnimationFrame = (function () {
             return window.requestAnimationFrame ||
                 window.webkitRequestAnimationFrame ||
@@ -78,6 +127,34 @@
                     window.setTimeout(callback, 17);
                 };
         }());
+
+        document.addEventListener('keydown',function(e){
+			console.log(e)
+			//arriba
+			if(e.keyCode == 87 || e.keyCode == 38 ){
+				//super_y -=10;
+                direccion = "up";
+			}
+
+			//abajo
+			if(e.keyCode == 83 || e.keyCode == 40 ){
+				//super_y +=10;
+                direccion = "down";
+			}
+			//izquierda
+			if(e.keyCode == 65 || e.keyCode == 37 ){
+            //super_x -=10;
+                direccion = "left";
+			}
+			
+			//derecha
+			if(e.keyCode == 68 || e.keyCode == 39 ){
+			//	super_x +=10;
+                direccion = "right";
+			}
+			
+			paint();
+		})
 
         window.addEventListener('load', run, false);
 
@@ -90,9 +167,9 @@
             return color;
         }
 
-		
-		
-		
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
 
 	</script>
 </body>
